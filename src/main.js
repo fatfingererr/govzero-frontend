@@ -26,7 +26,10 @@ Vue.use(VueMeta, {
 import VueTimeago from 'vue-timeago';
 Vue.use(VueTimeago, {
     name: 'Timeago', // Component name, `Timeago` by default
-    locale: 'zh', // Default locale
+    locale: 'en',
+    locales: {
+        zh: require('date-fns/locale/zh_cn'),
+      }
 });
 
 // vue-axios

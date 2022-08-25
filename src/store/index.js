@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import i18n from '../i18n';
 
 import wallet from './wallet.module';
+import treasury from './treasury.module';
 
 Vue.use(Vuex);
 
@@ -89,6 +90,7 @@ export default new Vuex.Store({
     },
     actions: {},
     modules: {
-        wallet
+        wallet,
+        treasury
     }
 });

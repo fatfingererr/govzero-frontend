@@ -18,6 +18,26 @@
           </li>
         </ul>
         <div class="navbar-item flex-row ml-md-auto">
+          <div
+            class="dark-mode d-flex align-items-center"
+            v-if="getAccount !== ''"
+          >
+            <b-badge
+              variant="outline-success"
+              class="outline-badge-success mr-1"
+              v-if="getChainId === masterNetId()"
+              >{{ chainName(getChainId) }}</b-badge
+            >
+            <button
+              variant="outline-danger"
+              class="outline-badge-danger mr-1"
+              @click="switchNetwork"
+              v-else
+            >
+              {{ $t("wrong-network") }}
+            </button>
+          </div>
+
           <div class="dark-mode d-flex align-items-center">
             <a
               v-if="$store.state.dark_mode == 'light'"
@@ -328,7 +348,7 @@
                         </b-dropdown-item>
                     </b-dropdown> -->
 
-          <div class="d-flex align-items-center" v-if="wallet.web3.givenProvider == null">
+          <div class="d-flex align-items-center" v-if="getAccount == ''">
             <a
               class="d-flex align-items-center btn btn-primary"
               @click="connectWallet()"
@@ -1389,9 +1409,13 @@
 <script>
 import VueMetamask from "vue-metamask"
 
+import ethers from "@/config/ethers.helper"
+
 import { mapGetters, mapActions } from "vuex"
 import {
   WALLET_ADDRESS,
+  GET_ACCOUNT,
+  GET_CHAIN_ID,
   GET_WALLET_SHORT_ADDRESS,
   CONNECT_WALLET
 } from "@/store/wallet.module"
@@ -1403,10 +1427,10 @@ export default {
       wallet: {
         message: "",
         metaMaskAddress: "",
-        netId: -1,
+        netID: -1,
         type: "",
         web3: {
-          givenProvider: null,
+          givenProvider: null
         }
       },
       msg: "This is demo net work",
@@ -1428,14 +1452,11 @@ export default {
         return false
       } else return true
     },
-    connectWallet() {
-      this.isConnecting = true
-    },
     disconnect() {
       this.wallet = {
         message: "",
         metaMaskAddress: "",
-        netId: -1,
+        netID: -1,
         type: "",
         web3: {
           givenProvider: null
@@ -1447,10 +1468,22 @@ export default {
     toggleMode(mode) {
       this.$appSetting.toggleMode(mode)
     },
+    masterNetId() {
+      return ethers.masterNetId()
+    },
+    switchNetwork() {
+      ethers.switchNetwork()
+    },
+    connectWallet() {
+      this.isConnecting = true
+    },
     async onComplete(data) {
+      console.log("data:", data)
       if (data !== null) {
         this.wallet = data
-        this.$store.dispatch(CONNECT_WALLET, this.wallet).then(() => {})
+        this.$store.dispatch(CONNECT_WALLET, this.wallet).then(() => {
+          this.switchNetwork()
+        })
       }
     },
     changeLanguageEN() {
@@ -1468,10 +1501,13 @@ export default {
     changeLanguage(item) {
       this.selectedLang = item
       this.$appSetting.toggleLanguage(item)
-    }
+    },
+     chainName(id) {
+      return ethers.chainName(id)
+    },
   },
   computed: {
-    ...mapGetters([GET_WALLET_SHORT_ADDRESS]),
+    ...mapGetters([GET_WALLET_SHORT_ADDRESS, GET_CHAIN_ID, GET_ACCOUNT]),
     ...mapActions([])
   }
 }

@@ -4,9 +4,11 @@ export const WALLET_ADDRESS = "walletAddress"
 
 // Actions
 export const CONNECT_WALLET = "connectWallet"
+export const SWITCH_NETWORK = "switchNetowrk"
 
 // Setters
 export const SET_WALLET = "setWallet"
+export const SET_CHAIN_ID = "setChainId"
 export const SET_PROVIDER = "setProvider"
 
 // Getters
@@ -21,7 +23,9 @@ const state = {
     metaMaskAddress: "",
     netID: -1,
     type: "",
-    web3: null,
+    web3: {
+      givenProvider: null,
+    },
     provider: null
   }
 }
@@ -34,7 +38,7 @@ const getters = {
     return state.web3 !== null
   },
   [GET_CHAIN_ID](state) {
-    return state.wallet.chainID
+    return state.wallet.netID
   },
   [GET_WALLET_SHORT_ADDRESS](state) {
     const addr = state.wallet.metaMaskAddress
@@ -44,6 +48,10 @@ const getters = {
 }
 
 const actions = {
+
+  [SWITCH_NETWORK](context, chainId){
+    context.commit(SET_CHAIN_ID, chainId)
+  },
   [CONNECT_WALLET](context, wallet) {
     if (wallet.type !== "NO_LOGIN") {
       localStorage.setItem(WALLET_ADDRESS, wallet.metaMaskAddress)
@@ -65,6 +73,9 @@ const actions = {
 const mutations = {
   [SET_WALLET](state, wallet) {
     state.wallet = wallet
+  },
+  [SET_CHAIN_ID](state, id) {
+    state.wallet.netID = id
   },
   [SET_PROVIDER](state, provider) {
     state.provider = provider
